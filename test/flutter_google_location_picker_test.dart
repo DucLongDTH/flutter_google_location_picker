@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_google_location_picker/flutter_google_location_picker.dart';
-import 'package:flutter_google_location_picker/model/pick_data_model.dart';
+import 'package:flutter_google_location_picker/model/lat_lng_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('added location longitude and latitude for current location', () {
     FlutterGoogleLocationPicker(
-        center: LatLong(23, 89),
+        center: LatLong(latitude: 0, longitude: 0),
         onPicked: (pickedData) {
           debugPrint(pickedData.latLong.latitude.toString());
           debugPrint(pickedData.latLong.longitude.toString());

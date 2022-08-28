@@ -1,56 +1,37 @@
-class LatLong {
-  final double latitude;
-  final double longitude;
-
-  LatLong(this.latitude, this.longitude);
-}
+import 'package:flutter_google_location_picker/export.dart';
 
 class PickedData {
-  final LatLong latLong;
-  final String address;
+  PickedData(
+      {required this.placeId,
+      required this.lat,
+      required this.lon,
+      required this.latLong,
+      required this.displayName,
+      this.address});
 
-  const PickedData({
-    required this.latLong,
-    required this.address,
-  });
+  int placeId;
+  double lat;
+  double lon;
+  LatLong latLong;
+  String displayName;
+  AddressModel? address;
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is PickedData &&
-          runtimeType == other.runtimeType &&
-          latLong == other.latLong &&
-          address == other.address);
+  factory PickedData.fromJson(Map<String, dynamic> json, LatLong latLong) =>
+      PickedData(
+          placeId: json["place_id"] ?? 0,
+          lat: json["lat"] ?? 0.0,
+          lon: json["lon"] ?? 0.0,
+          latLong: latLong,
+          displayName: json["display_name"] ?? "",
+          address: json["address"] != null
+              ? AddressModel.fromJson(json["address"])
+              : null);
 
-  @override
-  int get hashCode => latLong.hashCode ^ address.hashCode;
-
-  @override
-  String toString() {
-    return 'PickedData{ latLong: $latLong, address: $address,}';
-  }
-
-  PickedData copyWith({
-    LatLong? latLong,
-    String? address,
-  }) {
-    return PickedData(
-      latLong: latLong ?? this.latLong,
-      address: address ?? this.address,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'latLong': latLong,
-      'address': address,
-    };
-  }
-
-  factory PickedData.fromMap(Map<String, dynamic> map) {
-    return PickedData(
-      latLong: map['latLong'] as LatLong,
-      address: map['address'] as String,
-    );
-  }
+  Map<String, dynamic> toJson() => {
+        "place_id": placeId,
+        "lat": lat,
+        "lon": lon,
+        "display_name": displayName,
+        "address": address?.toJson(),
+      };
 }

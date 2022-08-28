@@ -1,13 +1,10 @@
 library flutter_google_location_picker;
 
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_google_location_picker/model/osm_data_model.dart';
-import 'package:flutter_google_location_picker/model/pick_data_model.dart';
-import 'package:flutter_google_location_picker/widget/custom_button.dart';
+import 'package:flutter_google_location_picker/export.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -46,25 +43,16 @@ class _FlutterGoogleLocationPickerState
   MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
-  List<OSMdata> _options = <OSMdata>[];
+  List<OSMData> _options = <OSMData>[];
   Timer? _debounce;
 
   void setNameCurrentPos() async {
-    var client = http.Client();
     double latitude = _mapController.center.latitude;
     double longitude = _mapController.center.longitude;
-    if (kDebugMode) {
-      print(latitude);
-    }
-    if (kDebugMode) {
-      print(longitude);
-    }
-    String url =
-        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=18&addressdetails=1';
 
-    var response = await client.post(Uri.parse(url));
-    var decodedResponse =
-        jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+    Map<String, dynamic> decodedResponse =
+        await HttpRequestCustom.requestWithLatLng(
+            latitude: latitude, longitude: longitude);
 
     _searchController.text =
         decodedResponse['display_name'] ?? "MOVE TO CURRENT POSITION";
@@ -72,21 +60,12 @@ class _FlutterGoogleLocationPickerState
   }
 
   void setNameCurrentPosAtInit() async {
-    var client = http.Client();
     double latitude = widget.center.latitude;
     double longitude = widget.center.longitude;
-    if (kDebugMode) {
-      print(latitude);
-    }
-    if (kDebugMode) {
-      print(longitude);
-    }
-    String url =
-        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$latitude&lon=$longitude&zoom=18&addressdetails=1';
 
-    var response = await client.post(Uri.parse(url));
-    var decodedResponse =
-        jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
+    Map<String, dynamic> decodedResponse =
+        await HttpRequestCustom.requestWithLatLng(
+            latitude: latitude, longitude: longitude);
 
     _searchController.text =
         decodedResponse['display_name'] ?? "MOVE TO CURRENT POSITION";
@@ -103,15 +82,13 @@ class _FlutterGoogleLocationPickerState
 
     _mapController.mapEventStream.listen((event) async {
       if (event is MapEventMoveEnd) {
-        var client = http.Client();
-        String url =
-            'https://nominatim.openstreetmap.org/reverse?format=json&lat=${event.center.latitude}&lon=${event.center.longitude}&zoom=18&addressdetails=1';
+        Map<String, dynamic> decodedResponse =
+            await HttpRequestCustom.requestWithLatLng(
+                latitude: event.center.latitude,
+                longitude: event.center.longitude);
 
-        var response = await client.post(Uri.parse(url));
-        var decodedResponse = jsonDecode(utf8.decode(response.bodyBytes))
-            as Map<dynamic, dynamic>;
-
-        _searchController.text = decodedResponse['display_name'];
+        _searchController.text =
+            decodedResponse['display_name'] ?? "MOVE TO CURRENT POSITION";
         if (mounted) {
           setState(() {});
         }
@@ -239,28 +216,13 @@ class _FlutterGoogleLocationPickerState
 
                         _debounce =
                             Timer(const Duration(milliseconds: 2000), () async {
-                          if (kDebugMode) {
-                            print(value);
-                          }
                           var client = http.Client();
                           try {
-                            String url =
-                                'https://nominatim.openstreetmap.org/search?q=$value&format=json&polygon_geojson=1&addressdetails=1';
-                            if (kDebugMode) {
-                              print(url);
-                            }
-                            var response = await client.post(Uri.parse(url));
                             var decodedResponse =
-                                jsonDecode(utf8.decode(response.bodyBytes))
-                                    as List<dynamic>;
-                            if (kDebugMode) {
-                              print(decodedResponse);
-                            }
+                                await HttpRequestCustom.requestWithSearch(
+                                    client: client, search: value);
                             _options = decodedResponse
-                                .map((e) => OSMdata(
-                                    displayname: e['display_name'],
-                                    lat: double.parse(e['lat']),
-                                    lon: double.parse(e['lon'])))
+                                .map((e) => OSMData.fromJson(e))
                                 .toList();
                             setState(() {});
                           } finally {
@@ -277,7 +239,7 @@ class _FlutterGoogleLocationPickerState
                         itemCount: _options.length > 5 ? 5 : _options.length,
                         itemBuilder: (context, index) {
                           return ListTile(
-                            title: Text(_options[index].displayname),
+                            title: Text(_options[index].displayName),
                             subtitle: Text(
                                 '${_options[index].lat},${_options[index].lon}'),
                             onTap: () {
@@ -326,16 +288,13 @@ class _FlutterGoogleLocationPickerState
   }
 
   Future<PickedData> pickData() async {
-    LatLong center = LatLong(
-        _mapController.center.latitude, _mapController.center.longitude);
-    var client = http.Client();
-    String url =
-        'https://nominatim.openstreetmap.org/reverse?format=json&lat=${_mapController.center.latitude}&lon=${_mapController.center.longitude}&zoom=18&addressdetails=1';
+    LatLong latLong = LatLong(
+        latitude: _mapController.center.latitude,
+        longitude: _mapController.center.longitude);
 
-    var response = await client.post(Uri.parse(url));
-    var decodedResponse =
-        jsonDecode(utf8.decode(response.bodyBytes)) as Map<dynamic, dynamic>;
-    String displayName = decodedResponse['display_name'];
-    return PickedData(latLong: center, address: displayName);
+    Map<String, dynamic> decodedResponse =
+        await HttpRequestCustom.requestWithLatLng(
+            latitude: latLong.latitude, longitude: latLong.longitude);
+    return PickedData.fromJson(decodedResponse, latLong);
   }
 }
