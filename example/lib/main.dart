@@ -35,7 +35,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
         appBar: AppBar(title: Text(widget.title)),
         body: FlutterGoogleLocationPicker(
-            center: LatLong(latitude: 0, longitude: 0),
+            center: LatLong(latitude: 33, longitude: -81),
             onPicked: (pickedData) {
               if (kDebugMode) {
                 print(pickedData.latLong.latitude);
