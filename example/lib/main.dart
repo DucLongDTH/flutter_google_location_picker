@@ -36,6 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(title: Text(widget.title)),
         body: FlutterGoogleLocationPicker(
             center: LatLong(latitude: 33, longitude: -81),
+            showZoomButtons: true,
             onPicked: (pickedData) {
               if (kDebugMode) {
                 print(pickedData.latLong.latitude);

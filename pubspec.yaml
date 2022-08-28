@@ -1,6 +1,6 @@
 name: flutter_google_location_picker
 description: A flutter plugin helps to search or pick location picker from map. It is completely free and easy to use.
-version: 0.0.1
+version: 0.0.2
 homepage: https://github.com/arsarsars1/flutter_google_location_picker.git
 
 environment:
@@ -13,6 +13,7 @@ dependencies:
   flutter_map: ^2.2.0
   http: ^0.13.5
   latlong2: ^0.8.1
+  connectivity_plus: ^2.3.6+1
 
 dev_dependencies:
   flutter_test:

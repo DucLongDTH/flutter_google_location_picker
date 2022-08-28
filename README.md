@@ -33,9 +33,9 @@ import 'package:flutter_google_location_picker/flutter_google_location_picker.da
 To use is simple, just call the widget bellow. You need to pass the default center position of the map and a onPicked method to get the picked position from the map.
 
     FlutterGoogleLocationPicker(
-            center: LatLong(23, 89),
-            onPicked: (pickedData) {
-            })
+        center: LatLong(23, 89),
+        onPicked: (pickedData) {
+        })
 
 # Then Usage
 
@@ -56,11 +56,25 @@ latLong has two more properties.
 For example
 
     FlutterGoogleLocationPicker(
-            center: LatLong(23, 89),
-            onPicked: (pickedData) {
-               print(pickedData.latLong.latitude);
-               print(pickedData.latLong.longitude);
-               print(pickedData.address);
-            })
+        center: LatLong(23, 89),
+        onPicked: (pickedData) {
+           print(pickedData.latLong.latitude);
+           print(pickedData.latLong.longitude);
+           print(pickedData.address);
+        })
 
 You can get latitude, longitude and address like that.
+
+If you want tools to zoom in and out just use the following example
+
+
+    FlutterGoogleLocationPicker(
+        showZoomButtons: true,
+        center: LatLong(23, 89),
+        onPicked: (pickedData) {
+           print(pickedData.latLong.latitude);
+           print(pickedData.latLong.longitude);
+           print(pickedData.address);
+        })
+
+You wil get the Map tools to handle the Ui accordingly.

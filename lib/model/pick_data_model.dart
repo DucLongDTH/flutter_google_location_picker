@@ -19,8 +19,8 @@ class PickedData {
   factory PickedData.fromJson(Map<String, dynamic> json, LatLong latLong) =>
       PickedData(
           placeId: json["place_id"] ?? 0,
-          lat: json["lat"] ?? 0.0,
-          lon: json["lon"] ?? 0.0,
+          lat: double.parse(json["lat"] ?? "0.0"),
+          lon: double.parse(json["lon"] ?? "0.0"),
           latLong: latLong,
           displayName: json["display_name"] ?? "",
           address: json["address"] != null
