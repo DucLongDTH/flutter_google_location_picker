@@ -217,7 +217,7 @@ class _FlutterGoogleLocationPickerState
                                 LatLng(
                                     _options[index].lat, _options[index].lon),
                                 15.0);
-
+                            _searchController.text =_options[index].displayName;
                             _focusNode.unfocus();
                             _options.clear();
                             setState(() {});
