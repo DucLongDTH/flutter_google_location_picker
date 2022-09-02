@@ -7,6 +7,9 @@ class AddressModel {
     required this.subDistrict,
     required this.country,
     required this.countryCode,
+    required this.postCode,
+    required this.locality,
+    required this.houseNumber,
   });
 
   String city;
@@ -16,6 +19,9 @@ class AddressModel {
   String state;
   String country;
   String countryCode;
+  String postCode;
+  String locality;
+  String houseNumber;
 
   factory AddressModel.fromJson(Map<String, dynamic> json) => AddressModel(
       village: json["village"] ?? "",
@@ -23,7 +29,10 @@ class AddressModel {
       city: json["city"] ?? "",
       subDistrict: json["subdistrict"] ?? "",
       state: json["state"] ?? "",
+      houseNumber: json["housenumber"] ?? "",
       country: json["country"] ?? "",
+      locality: json["locality"] ?? "",
+      postCode: json["postcode"] ?? "",
       countryCode: json["country_code"] ?? "");
 
   Map<String, dynamic> toJson() => {
@@ -33,6 +42,9 @@ class AddressModel {
         "subdistrict": subDistrict,
         "state": state,
         "country": country,
+        "locality": locality,
+        "housenumber": houseNumber,
+        "postcode": postCode,
         "country_code": countryCode
       };
 }

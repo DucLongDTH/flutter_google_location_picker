@@ -11,3 +11,9 @@
 * Performance increased
 * Network check
 * Map tools added
+
+## 0.0.3
+* Display text fix after picking location from search tool
+* Zip code added
+* Improvements
+* Fixes

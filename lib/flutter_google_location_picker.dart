@@ -96,183 +96,184 @@ class _FlutterGoogleLocationPickerState
 
     // String? _autocompleteSelection;
     return SafeArea(
-        child: Stack(children: [
-      Positioned.fill(
-          child: FlutterMap(
-              options: MapOptions(
-                  center:
-                      LatLng(widget.center.latitude, widget.center.longitude),
-                  zoom: 15.0,
-                  maxZoom: 18,
-                  minZoom: 6),
-              mapController: _mapController,
-              layers: [
-            TileLayerOptions(
-                urlTemplate: Config.urlTemplate, subdomains: ['a', 'b', 'c']),
-          ])),
-      Positioned(
-          top: MediaQuery.of(context).size.height * 0.5,
-          left: 0,
-          right: 0,
-          child: IgnorePointer(
-            child: Center(child: StatefulBuilder(builder: (context, setState) {
-              return Text(
-                _searchController.text,
-                textAlign: TextAlign.center,
-                style: widget.textStyle,
-              );
-            })),
-          )),
-      Positioned.fill(
-          child: IgnorePointer(
-        child: Center(
-            child: widget.markerWidget ??
-                Icon(
-                  Icons.location_pin,
-                  color: widget.markerColor ?? Theme.of(context).primaryColor,
-                  size: 50,
-                )),
-      )),
-      if (showZoom)
+      child: Stack(children: [
+        Positioned.fill(
+            child: FlutterMap(
+                options: MapOptions(
+                    center:
+                        LatLng(widget.center.latitude, widget.center.longitude),
+                    zoom: 15.0,
+                    maxZoom: 18,
+                    minZoom: 6),
+                mapController: _mapController,
+                layers: [
+              TileLayerOptions(
+                  urlTemplate: Config.urlTemplate, subdomains: ['a', 'b', 'c']),
+            ])),
         Positioned(
-            bottom: 120,
-            right: 5,
-            child: FloatingActionButton(
-              mini: true,
-              backgroundColor: Theme.of(context).primaryColor,
-              onPressed: () {
-                _mapController.move(
-                    _mapController.center, _mapController.zoom + 1);
-              },
-              child: const Icon(Icons.add),
+            top: MediaQuery.of(context).size.height * 0.5,
+            left: 0,
+            right: 0,
+            child: IgnorePointer(
+              child:
+                  Center(child: StatefulBuilder(builder: (context, setState) {
+                return Text(
+                  _searchController.text,
+                  textAlign: TextAlign.center,
+                  style: widget.textStyle,
+                );
+              })),
             )),
-      if (showZoom)
+        Positioned.fill(
+            child: IgnorePointer(
+          child: Center(
+              child: widget.markerWidget ??
+                  Icon(
+                    Icons.location_pin,
+                    color: widget.markerColor ?? Theme.of(context).primaryColor,
+                    size: 50,
+                  )),
+        )),
+        if (showZoom)
+          Positioned(
+              bottom: 120,
+              right: 5,
+              child: FloatingActionButton(
+                mini: true,
+                backgroundColor: Theme.of(context).primaryColor,
+                onPressed: () {
+                  _mapController.move(
+                      _mapController.center, _mapController.zoom + 1);
+                },
+                child: const Icon(Icons.add),
+              )),
+        if (showZoom)
+          Positioned(
+              bottom: 60,
+              right: 5,
+              child: FloatingActionButton(
+                mini: true,
+                backgroundColor: Theme.of(context).primaryColor,
+                onPressed: () {
+                  _mapController.move(
+                      _mapController.center, _mapController.zoom - 1);
+                },
+                child: const Icon(Icons.remove),
+              )),
         Positioned(
-            bottom: 60,
-            right: 5,
-            child: FloatingActionButton(
-              mini: true,
-              backgroundColor: Theme.of(context).primaryColor,
-              onPressed: () {
-                _mapController.move(
-                    _mapController.center, _mapController.zoom - 1);
-              },
-              child: const Icon(Icons.remove),
-            )),
-      Positioned(
-        top: 0,
-        left: 0,
-        right: 0,
-        child: Container(
-          margin: const EdgeInsets.all(15),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Column(
-            children: [
-              TextFormField(
-                  controller: _searchController,
-                  focusNode: _focusNode,
-                  decoration: widget.inputDecoration ??
-                      InputDecoration(
-                        hintText: 'Search Location',
-                        border: inputBorder,
-                        focusedBorder: inputFocusBorder,
-                      ),
-                  onChanged: (String value) {
-                    if (_debounce?.isActive ?? false) _debounce?.cancel();
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              margin: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: Column(children: [
+                TextFormField(
+                    controller: _searchController,
+                    focusNode: _focusNode,
+                    decoration: widget.inputDecoration ??
+                        InputDecoration(
+                          hintText: 'Search Location',
+                          border: inputBorder,
+                          focusedBorder: inputFocusBorder,
+                        ),
+                    onChanged: (String value) {
+                      if (_debounce?.isActive ?? false) _debounce?.cancel();
 
-                    _debounce =
-                        Timer(const Duration(milliseconds: 2000), () async {
-                      var client = http.Client();
-                      isProcess = true;
-                      RequestService().notifyListener();
-                      try {
-                        var osmList = await RequestService()
-                            .requestSearch(client: client, search: value);
-                        _options = osmList;
-                        isProcess = false;
+                      _debounce =
+                          Timer(const Duration(milliseconds: 2000), () async {
+                        var client = http.Client();
+                        isProcess = true;
                         RequestService().notifyListener();
-                      } finally {
-                        isProcess = false;
-                        client.close();
-                      }
+                        try {
+                          var osmList = await RequestService()
+                              .requestSearch(client: client, search: value);
+                          _options = osmList;
+                          isProcess = false;
+                          RequestService().notifyListener();
+                        } finally {
+                          isProcess = false;
+                          client.close();
+                        }
 
-                      RequestService().notifyListener();
-                    });
-                  }),
-              StatefulBuilder(
-                  builder: ((context, setState) => ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _options.length > 5 ? 5 : _options.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(_options[index].displayName),
-                          subtitle: Text(
-                              '${_options[index].lat},${_options[index].lon}'),
-                          onTap: () {
-                            _mapController.move(
-                                LatLng(
-                                    _options[index].lat, _options[index].lon),
-                                15.0);
-                            _searchController.text =_options[index].displayName;
-                            _focusNode.unfocus();
-                            _options.clear();
-                            setState(() {});
-                          },
-                        );
-                      }))),
-            ],
-          ),
-        ),
-      ),
-      Positioned(
-        bottom: 0,
-        left: 0,
-        right: 0,
-        child: Center(
-            child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: widget.buttonWidget != null
-              ? InkWell(
-                  onTap: () async {
-                    await RequestService()
-                        .pickData(
-                            latitude: _mapController.center.latitude,
-                            longitude: _mapController.center.longitude)
-                        .then((value) {
-                      widget.onPicked(value);
-                    });
-                  },
-                  child: widget.buttonWidget)
-              : CustomButton(
-                  'Set Current Location',
-                  onPressed: () async {
-                    FocusScope.of(context).unfocus();
+                        RequestService().notifyListener();
+                      });
+                    }),
+                StatefulBuilder(
+                    builder: ((context, setState) => ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _options.length > 5 ? 5 : _options.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(_options[index].displayName),
+                            subtitle: Text(
+                                '${_options[index].lat},${_options[index].lon}'),
+                            onTap: () {
+                              _mapController.move(
+                                  LatLng(
+                                      _options[index].lat, _options[index].lon),
+                                  15.0);
+                              _searchController.text =
+                                  _options[index].displayName;
+                              _focusNode.unfocus();
+                              _options.clear();
+                              setState(() {});
+                            },
+                          );
+                        }))),
+              ]),
+            )),
+        Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: widget.buttonWidget != null
+                    ? InkWell(
+                        onTap: () async {
+                          await RequestService()
+                              .pickData(
+                                  latitude: _mapController.center.latitude,
+                                  longitude: _mapController.center.longitude)
+                              .then((value) {
+                            widget.onPicked(value);
+                          });
+                        },
+                        child: widget.buttonWidget)
+                    : CustomButton(
+                        'Set Current Location',
+                        onPressed: () async {
+                          FocusScope.of(context).unfocus();
 
-                    isProcess = true;
-                    RequestService().notifyListener();
-                    RequestService()
-                        .pickData(
-                            latitude: _mapController.center.latitude,
-                            longitude: _mapController.center.longitude)
-                        .then((value) {
-                      isProcess = false;
-                      RequestService().notifyListener();
-                      widget.onPicked(value);
-                    });
-                  },
-                  backGroundColor: Theme.of(context).primaryColor,
-                ),
-        )),
-      ),
-      if (isProcess)
-        const Center(
-            child: CircularProgressIndicator(
-          color: Colors.black,
-        )),
-    ]));
+                          isProcess = true;
+                          RequestService().notifyListener();
+                          RequestService()
+                              .pickData(
+                                  latitude: _mapController.center.latitude,
+                                  longitude: _mapController.center.longitude)
+                              .then((value) {
+                            isProcess = false;
+                            RequestService().notifyListener();
+                            print(value.address!.toJson());
+                            widget.onPicked(value);
+                          });
+                        },
+                        backGroundColor: Theme.of(context).primaryColor,
+                      ),
+              ),
+            )),
+        if (isProcess)
+          const Center(
+              child: CircularProgressIndicator(
+            color: Colors.black,
+          )),
+      ]),
+    );
   }
 }

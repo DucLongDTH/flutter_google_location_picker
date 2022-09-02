@@ -53,7 +53,38 @@ class RequestService {
         await HttpRequestCustom.requestWithLatLng(
             latitude: latLong.latitude, longitude: latLong.longitude);
     notifyListener();
-    return PickedData.fromJson(decodedResponse, latLong);
+    PickedData pickedData = PickedData.fromJson(decodedResponse, latLong);
+    String postCode = "";
+    String country = "";
+    List<String> values = [];
+    try {
+      values = pickedData.displayName.split(",");
+      if (pickedData.address!.postCode.isNotNullOrEmpty()) {
+        postCode = pickedData.address!.postCode;
+      } else {
+        for (var element in values) {
+          if (element.trim().isZip5Code()) {
+            postCode = element.trim();
+          }
+        }
+        pickedData.address!.postCode = postCode;
+      }
+    } catch (e) {
+      country = "";
+    }
+    try {
+      if (pickedData.address!.country.isNotNullOrEmpty()) {
+        country = pickedData.address!.country;
+      } else {
+        if (values.isNotEmpty) {
+          country = values.last.trim();
+        }
+        pickedData.address!.country = country;
+      }
+    } catch (e) {
+      country = "";
+    }
+    return pickedData;
   }
 
   static Future<bool> checkInternet() async {
