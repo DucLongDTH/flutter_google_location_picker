@@ -11,7 +11,10 @@ import 'package:latlong2/latlong.dart';
 class FlutterGoogleLocationPicker extends StatefulWidget {
   final LatLong center;
   final TextStyle? textStyle;
+  final TextStyle? fieldStyle;
+  final TextStyle? fieldHintStyle;
   final Color? markerColor;
+  final Color fieldColor;
   final Widget? markerWidget;
   final Widget? buttonWidget;
   final InputDecoration? inputDecoration;
@@ -24,6 +27,9 @@ class FlutterGoogleLocationPicker extends StatefulWidget {
       required this.center,
       required this.onPicked,
       this.primaryColor,
+      this.fieldColor = Colors.white,
+      this.fieldStyle,
+      this.fieldHintStyle,
       this.textStyle = const TextStyle(fontWeight: FontWeight.w600),
       this.showZoomButtons,
       this.buttonWidget,
@@ -167,16 +173,18 @@ class _FlutterGoogleLocationPickerState
             child: Container(
               margin: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: widget.fieldColor,
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Column(children: [
                 TextFormField(
                     controller: _searchController,
                     focusNode: _focusNode,
+                    style: widget.fieldStyle,
                     decoration: widget.inputDecoration ??
                         InputDecoration(
                           hintText: 'Search Location',
+                          hintStyle: widget.fieldHintStyle,
                           border: inputBorder,
                           focusedBorder: inputFocusBorder,
                         ),
