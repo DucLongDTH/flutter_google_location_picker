@@ -21,19 +21,21 @@ class FlutterGoogleLocationPicker extends StatefulWidget {
   final InputDecoration? inputDecoration;
   final void Function(PickedData pickedData) onPicked;
   final Color? primaryColor;
-  final bool? showZoomButtons;
+  final Color? zoomIconColor;
+  final bool showZoomButtons;
 
   const FlutterGoogleLocationPicker(
       {Key? key,
       required this.center,
       required this.onPicked,
       this.primaryColor,
+      this.zoomIconColor,
       this.keepAlive = false,
       this.fieldColor = Colors.white,
       this.fieldStyle,
       this.fieldHintStyle,
       this.textStyle = const TextStyle(fontWeight: FontWeight.w600),
-      this.showZoomButtons,
+      this.showZoomButtons = false,
       this.buttonWidget,
       this.inputDecoration,
       this.markerWidget,
@@ -86,7 +88,6 @@ class _FlutterGoogleLocationPickerState
           color: widget.primaryColor ?? Theme.of(context).primaryColor,
           width: 2.0),
     );
-    final showZoom = widget.showZoomButtons ?? false;
 
     // String? _autocompleteSelection;
     return SafeArea(
@@ -145,7 +146,7 @@ class _FlutterGoogleLocationPickerState
                 ),
           )),
         ),
-        if (showZoom)
+        if (widget.showZoomButtons)
           Positioned(
               bottom: 120,
               right: 5,
@@ -156,9 +157,12 @@ class _FlutterGoogleLocationPickerState
                   _mapController.move(
                       _mapController.center, _mapController.zoom + 1);
                 },
-                child: const Icon(Icons.add),
+                child: Icon(
+                  Icons.add,
+                  color: widget.zoomIconColor,
+                ),
               )),
-        if (showZoom)
+        if (widget.showZoomButtons)
           Positioned(
               bottom: 60,
               right: 5,
@@ -169,7 +173,10 @@ class _FlutterGoogleLocationPickerState
                   _mapController.move(
                       _mapController.center, _mapController.zoom - 1);
                 },
-                child: const Icon(Icons.remove),
+                child: Icon(
+                  Icons.remove,
+                  color: widget.zoomIconColor,
+                ),
               )),
         Positioned(
             top: 0,
