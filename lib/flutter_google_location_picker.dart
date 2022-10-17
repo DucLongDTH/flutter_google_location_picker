@@ -10,6 +10,7 @@ import 'package:latlong2/latlong.dart';
 
 class FlutterGoogleLocationPicker extends StatefulWidget {
   final LatLong center;
+  final bool keepAlive;
   final TextStyle? textStyle;
   final TextStyle? fieldStyle;
   final TextStyle? fieldHintStyle;
@@ -27,6 +28,7 @@ class FlutterGoogleLocationPicker extends StatefulWidget {
       required this.center,
       required this.onPicked,
       this.primaryColor,
+      this.keepAlive = false,
       this.fieldColor = Colors.white,
       this.fieldStyle,
       this.fieldHintStyle,
@@ -45,7 +47,7 @@ class FlutterGoogleLocationPicker extends StatefulWidget {
 
 class _FlutterGoogleLocationPickerState
     extends State<FlutterGoogleLocationPicker> {
-  MapController _mapController = MapController();
+  final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _focusNode = FocusNode();
   List<OSMData> _options = <OSMData>[];
@@ -64,20 +66,6 @@ class _FlutterGoogleLocationPickerState
         setState(() {});
       }
     });
-    _mapController = MapController();
-
-    _mapController.onReady.then((_) {
-      setNameCurrentPos(
-          latitude: widget.center.latitude, longitude: widget.center.longitude);
-    });
-
-    _mapController.mapEventStream.listen((event) async {
-      if (event is MapEventMoveEnd) {
-        setNameCurrentPos(
-            latitude: event.center.latitude, longitude: event.center.longitude);
-      }
-    });
-
     super.initState();
   }
 
@@ -104,42 +92,59 @@ class _FlutterGoogleLocationPickerState
     return SafeArea(
       child: Stack(children: [
         Positioned.fill(
-            child: FlutterMap(
-                options: MapOptions(
-                    center:
-                        LatLng(widget.center.latitude, widget.center.longitude),
-                    zoom: 15.0,
-                    maxZoom: 18,
-                    minZoom: 6),
-                mapController: _mapController,
-                layers: [
-              TileLayerOptions(
-                  urlTemplate: Config.urlTemplate, subdomains: ['a', 'b', 'c']),
-            ])),
+          child: FlutterMap(
+              options: MapOptions(
+                  keepAlive: widget.keepAlive,
+                  center:
+                      LatLng(widget.center.latitude, widget.center.longitude),
+                  zoom: 15.0,
+                  maxZoom: 18,
+                  minZoom: 6,
+                  onMapEvent: (MapEvent mapEvent) {
+                    if (mapEvent is MapEventMoveEnd) {
+                      setNameCurrentPos(
+                          latitude: mapEvent.center.latitude,
+                          longitude: mapEvent.center.longitude);
+                    }
+                  },
+                  onMapReady: () {
+                    setNameCurrentPos(
+                        latitude: widget.center.latitude,
+                        longitude: widget.center.longitude);
+                  }),
+              mapController: _mapController,
+              children: [
+                TileLayer(
+                    urlTemplate: Config.urlTemplate,
+                    subdomains: const ['a', 'b', 'c']),
+              ]),
+        ),
         Positioned(
             top: MediaQuery.of(context).size.height * 0.5,
             left: 0,
             right: 0,
             child: IgnorePointer(
-              child:
-                  Center(child: StatefulBuilder(builder: (context, setState) {
-                return Text(
-                  _searchController.text,
-                  textAlign: TextAlign.center,
-                  style: widget.textStyle,
-                );
-              })),
+              child: Center(
+                child: StatefulBuilder(builder: (context, setState) {
+                  return Text(
+                    _searchController.text,
+                    textAlign: TextAlign.center,
+                    style: widget.textStyle,
+                  );
+                }),
+              ),
             )),
         Positioned.fill(
-            child: IgnorePointer(
-          child: Center(
-              child: widget.markerWidget ??
-                  Icon(
-                    Icons.location_pin,
-                    color: widget.markerColor ?? Theme.of(context).primaryColor,
-                    size: 50,
-                  )),
-        )),
+          child: IgnorePointer(
+              child: Center(
+            child: widget.markerWidget ??
+                Icon(
+                  Icons.location_pin,
+                  color: widget.markerColor ?? Theme.of(context).primaryColor,
+                  size: 50,
+                ),
+          )),
+        ),
         if (showZoom)
           Positioned(
               bottom: 120,
@@ -269,8 +274,10 @@ class _FlutterGoogleLocationPickerState
                             isProcess = false;
                             RequestService().notifyListener();
                             if (value.address != null) {
-                              print(value.address!.toJson());
+                              debugPrint(value.address!.toJson());
                               widget.onPicked(value);
+                            } else {
+                              debugPrint(value);
                             }
                           });
                         },
@@ -285,5 +292,9 @@ class _FlutterGoogleLocationPickerState
           )),
       ]),
     );
+  }
+
+  debugPrint(dynamic msg) {
+    debugPrint(msg.toString());
   }
 }

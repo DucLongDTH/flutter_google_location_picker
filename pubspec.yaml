@@ -10,10 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ^2.2.0
+  flutter_map: ^3.0.0
   http: ^0.13.5
   latlong2: ^0.8.1
-  connectivity_plus: ^2.3.6+1
+  connectivity_plus: ^2.3.9
 
 dev_dependencies:
   flutter_test:

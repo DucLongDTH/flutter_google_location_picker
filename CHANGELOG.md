@@ -17,3 +17,10 @@
 * Zip code added
 * Improvements
 * Fixes
+
+## 0.0.4
+* Plugins upgrade
+* Error handled
+* Map improvements
+* Null check fix
+* UI style dynamic
