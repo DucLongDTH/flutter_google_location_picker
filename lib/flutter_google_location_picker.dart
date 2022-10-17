@@ -281,10 +281,7 @@ class _FlutterGoogleLocationPickerState
                             isProcess = false;
                             RequestService().notifyListener();
                             if (value.address != null) {
-                              debugPrint(value.address!.toJson());
                               widget.onPicked(value);
-                            } else {
-                              debugPrint(value);
                             }
                           });
                         },
@@ -299,9 +296,5 @@ class _FlutterGoogleLocationPickerState
           )),
       ]),
     );
-  }
-
-  debugPrint(dynamic msg) {
-    debugPrint(msg.toString());
   }
 }
