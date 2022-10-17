@@ -268,8 +268,10 @@ class _FlutterGoogleLocationPickerState
                               .then((value) {
                             isProcess = false;
                             RequestService().notifyListener();
-                            print(value.address!.toJson());
-                            widget.onPicked(value);
+                            if (value.address != null) {
+                              print(value.address!.toJson());
+                              widget.onPicked(value);
+                            }
                           });
                         },
                         backGroundColor: Theme.of(context).primaryColor,
