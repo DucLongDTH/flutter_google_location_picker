@@ -4,7 +4,7 @@ version: 0.0.3
 homepage: https://github.com/arsarsars1/flutter_google_location_picker.git
 
 environment:
-  sdk: ">=2.17.6 <3.0.0"
+  sdk: ">=2.17.1 <3.0.0"
 
 dependencies:
   flutter:
