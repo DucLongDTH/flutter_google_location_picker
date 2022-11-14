@@ -101,21 +101,21 @@ class _FlutterGoogleLocationPickerState
                   zoom: 15.0,
                   maxZoom: 18,
                   minZoom: 6,
-                  onMapEvent: (MapEvent mapEvent) {
-                    if (mapEvent is MapEventMoveEnd) {
-                      setNameCurrentPos(
-                          latitude: mapEvent.center.latitude,
-                          longitude: mapEvent.center.longitude);
-                    }
-                  },
-                  onMapReady: () {
+                  // onPositionChanged: (MapEvent mapEvent) {
+                  //   if (mapEvent is MapEventMoveEnd) {
+                  //     setNameCurrentPos(
+                  //         latitude: mapEvent.center.latitude,
+                  //         longitude: mapEvent.center.longitude);
+                  //   }
+                  // },
+                  onMapCreated: (mapController) {
                     setNameCurrentPos(
                         latitude: widget.center.latitude,
                         longitude: widget.center.longitude);
                   }),
               mapController: _mapController,
-              children: [
-                TileLayer(
+              layers: [
+                TileLayerOptions(
                     urlTemplate: Config.urlTemplate,
                     subdomains: const ['a', 'b', 'c']),
               ]),
